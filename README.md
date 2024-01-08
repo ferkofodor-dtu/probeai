@@ -1,6 +1,7 @@
 # probeai
 
-A short description of the project.
+![description](https://github.com/ferkofodor-dtu/probeai/blob/master/reports/figures/description.jpg)
+
 
 ## Project structure
 
