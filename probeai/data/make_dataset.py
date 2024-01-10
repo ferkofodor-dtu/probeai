@@ -2,51 +2,67 @@ from pathlib import Path
 
 import click
 import torch
+from torchvision import transforms
+import cv2
+from torch.utils.data import Dataset
 
 
-def mnist(src=None):
-    """Return train and test dataloaders for MNIST."""
+class ProbeAIDataset(Dataset):
+    def __init__(self, data, targets, transform=None):
+        self.data = data
+        self.targets = torch.LongTensor(targets)
+        self.transform = transform
+        
+    def __getitem__(self, index):
+        x = self.data[index]
+        y = self.targets[index]
+        
+        if self.transform:
+            x = cv2.resize(x, (70,395), interpolation = cv2.INTER_AREA)
+            x = self.transform(x)
+        
+        return x, y
+    
+    def __len__(self):
+        return len(self.data)
+    
+
+def load_probeai(src=None):
+    """Return train and test dataloaders for ProbeAI."""
     if src is None:
-        src = Path.cwd() / "data" / "raw" / "mnist"
+        src = Path.cwd() / "data" / "raw"
     else:
         src = Path(src)
 
-    train_data, train_labels = [], []
-    for i in range(5):
-        train_data.append(torch.load(src / f"train_images_{i}.pt"))
-        train_labels.append(torch.load(src / f"train_target_{i}.pt"))
+    train_data = torch.load(src / "train_data.pt")
+    test_data = torch.load(src / "test_data.pt")
 
-    train_data = torch.cat(train_data, dim=0)
-    train_labels = torch.cat(train_labels, dim=0)
+    train_labels = torch.load(src / "train_labels.pt")
+    test_labels = torch.load(src / "test_labels.pt")
 
-    test_data = torch.load(src / "test_images.pt")
-    test_labels = torch.load(src / "test_target.pt")
+    transform = transforms.Compose(
+        [transforms.ToTensor(),
+        transforms.Normalize((0.0), (1.0)),])
 
-    train_data = train_data.unsqueeze(1)
-    test_data = test_data.unsqueeze(1)
+    train_dataset = ProbeAIDataset(train_data, train_labels, transform=transform)
+    test_dataset = ProbeAIDataset(test_data, test_labels, transform=transform)
 
-    # print(train_data.shape)
-    # print(train_labels.shape)
-    # print(test_data.shape)
-    # print(test_labels.shape)
+    # train_dataset = train_dataset.unsqueeze(1)
+    # test_dataset = test_dataset.unsqueeze(1)
 
-    return (
-        torch.utils.data.TensorDataset(train_data, train_labels),
-        torch.utils.data.TensorDataset(test_data, test_labels),
-    )
+    return train_dataset, test_dataset
 
 
 @click.command()
 @click.argument("src", type=click.Path(exists=True))
 @click.argument("dst", type=click.Path())
-@click.argument("dataset", type=str)
-def main(src, dst, dataset):
+def main(src, dst):
     """Process the data and save it."""
-    src = Path.cwd() / src / dataset
-    dst = Path.cwd() / dst / dataset
+    src = Path.cwd() / src
+    dst = Path.cwd() / dst
     dst.mkdir(parents=True, exist_ok=True)
 
-    train_data, test_data = mnist(src)
+    train_data, test_data = load_probeai(src)
     torch.save(train_data, dst / "train_data.pt")
     torch.save(test_data, dst / "test_data.pt")
 

@@ -21,13 +21,13 @@ class MyNeuralNet(nn.Module):
         """
         super(MyNeuralNet, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_features, 32, 3)  # [B, 1, 28, 28] -> [B, 32, 26, 26]
+        self.conv1 = nn.Conv2d(in_features, 32, 3)  # [B, 1, 70, 395] -> [B, 32, 68, 393]
         self.relu1 = nn.LeakyReLU()
-        self.conv2 = nn.Conv2d(32, 64, 3)  # [B, 32, 26, 26] -> [B, 64, 24, 24]
+        self.conv2 = nn.Conv2d(32, 64, 3)  # [B, 32, 68, 393] -> [B, 64, 66, 391]
         self.relu2 = nn.LeakyReLU()
-        self.maxpool = nn.MaxPool2d(2)  # [B, 64, 24, 24] -> [B, 64, 12, 12]
-        self.flatten = nn.Flatten()  # [B, 64, 12, 12] -> [B, 64 * 12 * 12]
-        self.fc1 = nn.Linear(64 * 12 * 12, 500)
+        self.maxpool = nn.MaxPool2d(2)  # [B, 64, 66, 391] -> [B, 64, 33, 195]
+        self.flatten = nn.Flatten()  # [B, 64, 33, 195] -> [B, 64 * 33 * 195]
+        self.fc1 = nn.Linear(64 * 33 * 195, 500)
         self.relu3 = nn.LeakyReLU()
         self.fc2 = nn.Linear(500, out_features)
 

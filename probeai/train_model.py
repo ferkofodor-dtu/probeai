@@ -4,15 +4,15 @@ import click
 import matplotlib.pyplot as plt
 import torch
 
-from data.make_dataset import mnist
+from data.make_dataset import load_probeai
 from models.model import MyNeuralNet
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 @click.command()
-@click.option("--epochs", default=10, help="number of epochs to train for")
-@click.option("--batch", default=256, help="batch size to use for training")
+@click.option("--epochs", default=5, help="number of epochs to train for")
+@click.option("--batch", default=8, help="batch size to use for training")
 @click.option("--lr", default=1e-3, help="learning rate to use for training")
 def train(epochs, batch, lr):
     """Train a model on MNIST."""
@@ -20,10 +20,10 @@ def train(epochs, batch, lr):
     print(f"E: {epochs}, B: {batch}, LR: {lr}")
 
     # Initialize the model
-    model = MyNeuralNet(1, 10).to(device)
+    model = MyNeuralNet(1, 2).to(device)
 
     # Get the data
-    train_data, test_data = mnist()
+    train_data, test_data = load_probeai()
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=batch, shuffle=True)
     testloader = torch.utils.data.DataLoader(test_data, batch_size=batch, shuffle=True)
 

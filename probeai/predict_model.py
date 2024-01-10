@@ -1,10 +1,8 @@
 from pathlib import Path
-
 import click
 import torch
 from visualizations.visualize import visualize_tsne
-
-from data.make_dataset import mnist
+from data.make_dataset import load_probeai
 
 
 def predict(model: torch.nn.Module, dataloader: torch.utils.data.DataLoader) -> None:
@@ -59,7 +57,7 @@ def main(src):
     """Run prediction for a given model and dataloader."""
     src = Path.cwd() / src
     model = torch.load(src).cpu()
-    _, test_data = mnist()
+    _, test_data = load_probeai()
     testloader = torch.utils.data.DataLoader(test_data, batch_size=256, shuffle=True)
     predict(model, testloader)
 
