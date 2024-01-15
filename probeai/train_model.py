@@ -8,6 +8,8 @@ import logging
 from data.make_dataset import load_probeai
 from omegaconf import OmegaConf
 from models.model import MyNeuralNet
+from torch.profiler import profile, ProfilerActivity
+from torch.profiler import profile, tensorboard_trace_handler
 
 log = logging.getLogger(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -29,7 +31,7 @@ def train(config):
     # Initialize the model
     model = MyNeuralNet(modelc_['in_features'], modelc_['out_features']).to(device)
 
-    log.info(hyperpms['dataset_path'])
+    log.info(f"Dataset path: {hyperpms['dataset_path']}")
     # Get the data
     train_data, test_data = load_probeai(hyperpms['dataset_path'])
     trainloader = torch.utils.data.DataLoader(train_data, batch_size=hyperpms['batch_size'], shuffle=True)
@@ -39,44 +41,72 @@ def train(config):
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=hyperpms['lr'])
 
+
+    # Profiling
+    prof = torch.profiler.profile(
+    activities=[
+        torch.profiler.ProfilerActivity.CPU,
+        torch.profiler.ProfilerActivity.CUDA,
+    ],
+
+    # In this example with wait=1, warmup=1, active=2, repeat=1,
+    # profiler will skip the first step/iteration,
+    # start warming up on the second, record
+    # the third and the forth iterations,
+    # after which the trace will become available
+    # and on_trace_ready (when set) is called;
+    # the cycle repeats starting with the next step
+
+    schedule=torch.profiler.schedule(
+        wait=1,
+        warmup=1,
+        active=2,
+        repeat=1),
+    on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/profile')
+    # used when outputting for tensorboard
+    )
+
     train_losses, test_losses = [], []
+    # Training loop
     for e in range(hyperpms['n_epochs']):
         running_loss = 0
-        for images, labels in trainloader:
-            # Flatten MNIST images into a 784 long vector
-            images = images.to(device)
-            labels = labels.to(device)
-            optimizer.zero_grad()
-            output, _ = model(images)
-            loss = criterion(output, labels)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.cpu().item()
-        train_losses.append(running_loss / len(trainloader))
+        with prof:
+            for images, labels in trainloader:
+                # Flatten MNIST images into a 784 long vector
+                images = images.to(device)
+                labels = labels.to(device)
+                optimizer.zero_grad()
+                output, _ = model(images)
+                loss = criterion(output, labels)
+                loss.backward()
+                optimizer.step()
+                prof.step()
 
-        # Turn off gradients for validation
-        model.eval()
-        correct = 0
-        total = 0
-        with torch.no_grad():
-            running_loss = 0
-            for data in testloader:
-                inputs, labels = data
-                inputs, labels = inputs.to(device), labels.to(device)
-                log_ps, _ = model(inputs)
-                _, predicted = torch.max(log_ps.data, 1)
-                total += labels.size(0)
-                correct += (predicted == labels).sum().item()
-                loss = criterion(log_ps, labels)
                 running_loss += loss.cpu().item()
-            test_losses.append(running_loss / len(testloader))
+            train_losses.append(running_loss / len(trainloader))
 
-        # Make sure the model is back in training mode
-        model.train()
+            # Turn off gradients for validation
+            model.eval()
+            correct = 0
+            total = 0
+            with torch.no_grad():
+                running_loss = 0
+                for data in testloader:
+                    inputs, labels = data
+                    inputs, labels = inputs.to(device), labels.to(device)
+                    log_ps, _ = model(inputs)
+                    _, predicted = torch.max(log_ps.data, 1)
+                    total += labels.size(0)
+                    correct += (predicted == labels).sum().item()
+                    loss = criterion(log_ps, labels)
+                    running_loss += loss.cpu().item()
+                test_losses.append(running_loss / len(testloader))
 
-        if e % 5 == 0:
+            model.train()
+            # if e % 1 == 0:
             log.info(f"Epoch: {e}, Training loss: {train_losses[-1]:.4f}, Validation loss: {test_losses[-1]:.4f}")
-
+    
+    
     # Save the model
     src = Path.cwd() / "models" / "model.pth"
     src.parent.mkdir(parents=True, exist_ok=True)
