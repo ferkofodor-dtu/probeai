@@ -32,9 +32,9 @@ def load_probeai(src=None):
     if src is None:
         src = Path.cwd() / "data" / "raw"
     else:
-        src = Path(src)
+        src = Path(src).expanduser()
 
-    train_data = torch.load(src / "train_data.pt")
+    train_data = torch.load(str(src / "train_data.pt"))
     test_data = torch.load(src / "test_data.pt")
 
     train_labels = torch.load(src / "train_labels.pt")
@@ -61,6 +61,9 @@ def main(src, dst):
     src = Path.cwd() / src
     dst = Path.cwd() / dst
     dst.mkdir(parents=True, exist_ok=True)
+    
+    src.expanduser()
+    dst.expanduser()
 
     train_data, test_data = load_probeai(src)
     torch.save(train_data, dst / "train_data.pt")

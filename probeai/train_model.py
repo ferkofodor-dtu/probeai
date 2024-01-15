@@ -3,36 +3,44 @@ from pathlib import Path
 import click
 import matplotlib.pyplot as plt
 import torch
-
+import hydra
+import logging
 from data.make_dataset import load_probeai
+from omegaconf import OmegaConf
 from models.model import MyNeuralNet
 
+log = logging.getLogger(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# @click.command()
+# @click.option("--epochs", default=5, help="number of epochs to train for")
+# @click.option("--batch", default=8, help="batch size to use for training")
+# @click.option("--lr", default=1e-3, help="learning rate to use for training")
+@hydra.main(version_base="1.1", config_path="config", config_name="defaults.yaml")
+def train(config):
+    log.info(OmegaConf.to_yaml(config))
+    log.info("Training day and night")
 
-@click.command()
-@click.option("--epochs", default=5, help="number of epochs to train for")
-@click.option("--batch", default=8, help="batch size to use for training")
-@click.option("--lr", default=1e-3, help="learning rate to use for training")
-def train(epochs, batch, lr):
-    """Train a model on MNIST."""
-    print("Training day and night")
-    print(f"E: {epochs}, B: {batch}, LR: {lr}")
+    # Get the config
+    modelc_ = config.model_conf
+    hyperpms = config.train_conf
+    torch.manual_seed(hyperpms['seed'])
 
     # Initialize the model
-    model = MyNeuralNet(1, 2).to(device)
+    model = MyNeuralNet(modelc_['in_features'], modelc_['out_features']).to(device)
 
+    log.info(hyperpms['dataset_path'])
     # Get the data
-    train_data, test_data = load_probeai()
-    trainloader = torch.utils.data.DataLoader(train_data, batch_size=batch, shuffle=True)
-    testloader = torch.utils.data.DataLoader(test_data, batch_size=batch, shuffle=True)
+    train_data, test_data = load_probeai(hyperpms['dataset_path'])
+    trainloader = torch.utils.data.DataLoader(train_data, batch_size=hyperpms['batch_size'], shuffle=True)
+    testloader = torch.utils.data.DataLoader(test_data, batch_size=hyperpms['batch_size'], shuffle=True)
 
     # Train the model
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.Adam(model.parameters(), lr=hyperpms['lr'])
 
     train_losses, test_losses = [], []
-    for e in range(epochs):
+    for e in range(hyperpms['n_epochs']):
         running_loss = 0
         for images, labels in trainloader:
             # Flatten MNIST images into a 784 long vector
@@ -67,7 +75,7 @@ def train(epochs, batch, lr):
         model.train()
 
         if e % 5 == 0:
-            print(f"Epoch: {e}, Training loss: {train_losses[-1]:.4f}, Validation loss: {test_losses[-1]:.4f}")
+            log.info(f"Epoch: {e}, Training loss: {train_losses[-1]:.4f}, Validation loss: {test_losses[-1]:.4f}")
 
     # Save the model
     src = Path.cwd() / "models" / "model.pth"
