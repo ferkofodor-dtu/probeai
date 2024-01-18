@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "probeai"
-version = "1.1.0"
-description = "A short description of the project."
+version = "1.2.0"
+description = "A tool for training a neural network for probe mark classification."
 authors = [
-  { name = "Ferenc Fodor (imec and DTU)", email = "your@email.com" },
+  { name = "Ferenc Fodor (imec and DTU)", email = "s220356@email.com" },
 ]
 license = { file = "LICENSE" }
 readme = "README.md"

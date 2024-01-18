@@ -3,29 +3,26 @@ from pathlib import Path
 import click
 import torch
 from torchvision import transforms
-import cv2
 from torch.utils.data import Dataset
-
 
 class ProbeAIDataset(Dataset):
     def __init__(self, data, targets, transform=None):
         self.data = data
         self.targets = torch.LongTensor(targets)
         self.transform = transform
-        
+
     def __getitem__(self, index):
         x = self.data[index]
         y = self.targets[index]
-        
+
         if self.transform:
-            x = cv2.resize(x, (70,395), interpolation = cv2.INTER_AREA)
             x = self.transform(x)
-        
+
         return x, y
-    
+
     def __len__(self):
         return len(self.data)
-    
+
 
 def load_probeai(src=None):
     """Return train and test dataloaders for ProbeAI."""
@@ -61,7 +58,7 @@ def main(src, dst):
     src = Path.cwd() / src
     dst = Path.cwd() / dst
     dst.mkdir(parents=True, exist_ok=True)
-    
+
     src.expanduser()
     dst.expanduser()
 
