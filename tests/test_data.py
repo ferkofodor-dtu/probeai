@@ -5,7 +5,7 @@ import numpy as np
 
 
 def test_data():
-    train, test = load_probeai(_PATH_DATA)
+    train, test = load_probeai()
     assert len(train) == 108
     assert len(test) == 92
     assert len(set([train[i][0].shape for i in range(len(train))])) == 1
