@@ -26,7 +26,7 @@ def make_loader(dataset, batch_size):
 
 def make(config):
     # Make the data
-    train, test = load_probeai(config.train_conf["dataset_path"])
+    train, test = load_probeai()
     train_loader = make_loader(train, batch_size=config.train_conf["batch_size"])
     test_loader = make_loader(test, batch_size=config.train_conf["batch_size"])
 
@@ -86,11 +86,6 @@ def test(model, test_loader, criterion, epoch, save_model=False):
     return running_loss / len(test_loader)
 
 
-    if save_model:
-        # Save the model in the exchangeable ONNX format
-        torch.onnx.export(model, images, f"model_{epoch}.onnx")
-        # wandb.save(f"model_{epoch}.onnx")
-
 
 # @click.command()
 # @click.option("--epochs", default=5, help="number of epochs to train for")
@@ -107,7 +102,6 @@ def train(config):
 
     torch.manual_seed(config.train_conf["seed"])
 
-    log.info(f"Dataset path: {config.train_conf['dataset_path']}")
 
     model, train_loader, test_loader, criterion, optimizer = make(config)
 

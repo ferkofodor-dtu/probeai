@@ -11,5 +11,5 @@ def probeai_model():
 def test_model_output_shape(probeai_model):
     model = probeai_model
     dummy_input = torch.randn(1, 1, 395, 70)  # assuming MNIST image size
-    output, _ = model(dummy_input)
+    output = model(dummy_input)
     assert output.shape == torch.Size([1, 2])

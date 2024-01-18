@@ -9,7 +9,6 @@ from torchmetrics.classification import Accuracy
 from lightning.pytorch.loggers import WandbLogger
 
 
-
 class MyLightningModel(L.LightningModule):
     def __init__(self, config):
         super(MyLightningModel, self).__init__()
@@ -62,7 +61,7 @@ def make_loader(dataset, batch_size, shuffle=True):
 
 def train(config):
     # Make the data
-    train, test = load_probeai(config.train_conf['dataset_path'])
+    train, test = load_probeai()
     train_loader = make_loader(train, batch_size=config.train_conf['batch_size'])
     test_loader = make_loader(test, batch_size=config.train_conf['batch_size'], shuffle=False)
 
@@ -96,7 +95,7 @@ def train(config):
 
 
 
-@hydra.main(version_base="1.1", config_path="config", config_name="defaults.yaml")
+@hydra.main(version_base=None, config_path="config", config_name="defaults.yaml")
 def hydra_train(config):
     L.seed_everything(config.train_conf['seed'])
     train(config)
