@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import click
 import matplotlib.pyplot as plt
 import torch
 import hydra
@@ -8,8 +7,6 @@ import logging
 from data.make_dataset import load_probeai
 from omegaconf import OmegaConf
 from models.model import MyNeuralNet
-from torch.profiler import profile, ProfilerActivity
-from torch.profiler import profile, tensorboard_trace_handler
 import wandb
 
 wandb.login()
@@ -20,29 +17,37 @@ wandb.init(project="probeai")
 log = logging.getLogger(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def make_loader(dataset, batch_size):
-    loader = torch.utils.data.DataLoader(dataset=dataset,
-                                         batch_size=batch_size, 
-                                         shuffle=True,
-                                         pin_memory=True, num_workers=2)
+    loader = torch.utils.data.DataLoader(
+        dataset=dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        pin_memory=True,
+        num_workers=2,
+    )
     return loader
 
 
 def make(config):
     # Make the data
-    train, test = load_probeai(config.train_conf['dataset_path'])
-    train_loader = make_loader(train, batch_size=config.train_conf['batch_size'])
-    test_loader = make_loader(test, batch_size=config.train_conf['batch_size'])
+    train, test = load_probeai(config.train_conf["dataset_path"])
+    train_loader = make_loader(train, batch_size=config.train_conf["batch_size"])
+    test_loader = make_loader(test, batch_size=config.train_conf["batch_size"])
 
     # Make the model
-    model = MyNeuralNet(config.model_conf['in_features'], config.model_conf['out_features']).to(device)
+    model = MyNeuralNet(
+        config.model_conf["in_features"], config.model_conf["out_features"]
+    ).to(device)
 
     # Make the loss and optimizer
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(
-        model.parameters(), lr=config.train_conf['learning_rate'])
-    
+        model.parameters(), lr=config.train_conf["learning_rate"]
+    )
+
     return model, train_loader, test_loader, criterion, optimizer
+
 
 def train_log(loss, example_ct, epoch):
     # Where the magic happens
@@ -52,11 +57,11 @@ def train_log(loss, example_ct, epoch):
 
 def train_batch(images, labels, model, optimizer, criterion):
     images, labels = images.to(device), labels.to(device)
-    
+
     # Forward pass ➡
     outputs, _ = model(images)
     loss = criterion(outputs, labels)
-    
+
     # Backward pass ⬅
     optimizer.zero_grad()
     loss.backward()
@@ -65,6 +70,7 @@ def train_batch(images, labels, model, optimizer, criterion):
     optimizer.step()
 
     return loss
+
 
 def test(model, test_loader, criterion, epoch, save_model=False):
     model.eval()
@@ -81,12 +87,14 @@ def test(model, test_loader, criterion, epoch, save_model=False):
             loss = criterion(log_ps, labels)
             running_loss += loss.cpu().item()
 
-        print(f"Accuracy of the model on the {total} " +
-              f"test images: {correct / total:%}")
-        
+        print(
+            f"Accuracy of the model on the {total} "
+            + f"test images: {correct / total:%}"
+        )
+
     return running_loss / len(test_loader)
-        
-        # wandb.log({"test_accuracy": correct / total})
+
+    # wandb.log({"test_accuracy": correct / total})
 
     if save_model:
         # Save the model in the exchangeable ONNX format
@@ -103,8 +111,7 @@ def train(config):
     log.info(OmegaConf.to_yaml(config))
     log.info("Training day and night")
 
-
-    torch.manual_seed(config.train_conf['seed'])
+    torch.manual_seed(config.train_conf["seed"])
 
     log.info(f"Dataset path: {config.train_conf['dataset_path']}")
 
@@ -112,35 +119,29 @@ def train(config):
 
     # Profiling
     prof = torch.profiler.profile(
-    activities=[
-        torch.profiler.ProfilerActivity.CPU,
-        torch.profiler.ProfilerActivity.CUDA,
-    ],
-
-    # In this example with wait=1, warmup=1, active=2, repeat=1,
-    # profiler will skip the first step/iteration,
-    # start warming up on the second, record
-    # the third and the forth iterations,
-    # after which the trace will become available
-    # and on_trace_ready (when set) is called;
-    # the cycle repeats starting with the next step
-
-    schedule=torch.profiler.schedule(
-        wait=1,
-        warmup=1,
-        active=2,
-        repeat=1),
-    on_trace_ready=torch.profiler.tensorboard_trace_handler('./log/profile')
-    # used when outputting for tensorboard
+        activities=[
+            torch.profiler.ProfilerActivity.CPU,
+            torch.profiler.ProfilerActivity.CUDA,
+        ],
+        # In this example with wait=1, warmup=1, active=2, repeat=1,
+        # profiler will skip the first step/iteration,
+        # start warming up on the second, record
+        # the third and the forth iterations,
+        # after which the trace will become available
+        # and on_trace_ready (when set) is called;
+        # the cycle repeats starting with the next step
+        schedule=torch.profiler.schedule(wait=1, warmup=1, active=2, repeat=1),
+        on_trace_ready=torch.profiler.tensorboard_trace_handler("./log/profile")
+        # used when outputting for tensorboard
     )
 
-    total_batches = len(train_loader) * config.train_conf["n_epochs"]
+    #total_batches = len(train_loader) * config.train_conf["n_epochs"]
     example_ct = 0  # number of examples seen
     batch_ct = 0
 
     train_losses, test_losses = [], []
     # Training loop
-    for e in range(config.train_conf['n_epochs']):
+    for e in range(config.train_conf["n_epochs"]):
         running_loss = 0
         with prof:
             for images, labels in train_loader:
@@ -154,9 +155,10 @@ def train(config):
             test_loss = test(model, test_loader, criterion, e)
             test_losses.append(test_loss)
 
-            log.info(f"Epoch: {e}, Training loss: {train_losses[-1]:.4f}, Validation loss: {test_losses[-1]:.4f}")
-    
-    
+            log.info(
+                f"Epoch: {e}, Training loss: {train_losses[-1]:.4f}, Validation loss: {test_losses[-1]:.4f}"
+            )
+
     # Save the model
     src = Path.cwd() / "models" / "model.pth"
     src.parent.mkdir(parents=True, exist_ok=True)
@@ -172,5 +174,4 @@ def train(config):
 
 
 if "__main__" == __name__:
-    
     train()

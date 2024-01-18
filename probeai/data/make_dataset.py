@@ -18,7 +18,7 @@ class ProbeAIDataset(Dataset):
         y = self.targets[index]
         
         if self.transform:
-            x = cv2.resize(x, (70,395), interpolation = cv2.INTER_AREA)
+            x = cv2.resize(x, (70, 395), interpolation = cv2.INTER_AREA)
             x = self.transform(x)
         
         return x, y

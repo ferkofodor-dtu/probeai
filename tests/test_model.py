@@ -1,13 +1,12 @@
 import torch
-from torch.utils.data import DataLoader
-from torchvision import transforms
 from probeai.models.model import MyNeuralNet
-from torchvision.datasets import MNIST
 import pytest
+
 
 @pytest.fixture
 def probeai_model():
     return MyNeuralNet(1, 2)
+
 
 def test_model_output_shape(probeai_model):
     model = probeai_model
