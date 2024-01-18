@@ -1,0 +1,5 @@
+dataset_path: ~/probeai/data/raw
+batch_size: 4
+lr: 0.01
+n_epochs: 5
+seed: 42
