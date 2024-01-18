@@ -10,9 +10,86 @@ from omegaconf import OmegaConf
 from models.model import MyNeuralNet
 from torch.profiler import profile, ProfilerActivity
 from torch.profiler import profile, tensorboard_trace_handler
+import wandb
+
+wandb.login()
 
 log = logging.getLogger(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+def make_loader(dataset, batch_size):
+    loader = torch.utils.data.DataLoader(dataset=dataset,
+                                         batch_size=batch_size, 
+                                         shuffle=True,
+                                         pin_memory=True, num_workers=2)
+    return loader
+
+
+def make(config):
+    # Make the data
+    train, test = load_probeai(config.dataset_path)
+    train_loader = make_loader(train, batch_size=config.batch_size)
+    test_loader = make_loader(test, batch_size=config.batch_size)
+
+    # Make the model
+    model = MyNeuralNet(config.in_features, config.out_features).to(device)
+
+    # Make the loss and optimizer
+    criterion = torch.nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(
+        model.parameters(), lr=config.learning_rate)
+    
+    return model, train_loader, test_loader, criterion, optimizer
+
+def train_log(loss, example_ct, epoch):
+    # Where the magic happens
+    wandb.log({"epoch": epoch, "loss": loss}, step=example_ct)
+    print(f"Loss after {str(example_ct).zfill(5)} examples: {loss:.3f}")
+
+
+def train_batch(images, labels, model, optimizer, criterion):
+    images, labels = images.to(device), labels.to(device)
+    
+    # Forward pass ➡
+    outputs = model(images)
+    loss = criterion(outputs, labels)
+    
+    # Backward pass ⬅
+    optimizer.zero_grad()
+    loss.backward()
+
+    # Step with optimizer
+    optimizer.step()
+
+    return loss
+
+def test(model, test_loader, criterion, epoch, save_model=False):
+    model.eval()
+    test_losses = []
+    # Run the model on some test examples
+    with torch.no_grad():
+        running_loss = 0
+        correct, total = 0, 0
+        for images, labels in test_loader:
+            inputs, labels = images.to(device), labels.to(device)
+            log_ps, _ = model(inputs)
+            _, predicted = torch.max(log_ps.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+            loss = criterion(log_ps, labels)
+            running_loss += loss.cpu().item()
+        test_losses.append(running_loss / len(test_loader))
+
+        print(f"Accuracy of the model on the {total} " +
+              f"test images: {correct / total:%}")
+        
+        wandb.log({"test_accuracy": correct / total})
+
+    if save_model:
+        # Save the model in the exchangeable ONNX format
+        torch.onnx.export(model, images, f"model_{epoch}.onnx")
+        wandb.save(f"model_{epoch}.onnx")
+
 
 # @click.command()
 # @click.option("--epochs", default=5, help="number of epochs to train for")
@@ -26,21 +103,15 @@ def train(config):
     # Get the config
     modelc_ = config.model_conf
     hyperpms = config.train_conf
+    
+    # append two configs
+    modelc = OmegaConf.merge(modelc_, hyperpms)
+
     torch.manual_seed(hyperpms['seed'])
 
-    # Initialize the model
-    model = MyNeuralNet(modelc_['in_features'], modelc_['out_features']).to(device)
-
     log.info(f"Dataset path: {hyperpms['dataset_path']}")
-    # Get the data
-    train_data, test_data = load_probeai(hyperpms['dataset_path'])
-    trainloader = torch.utils.data.DataLoader(train_data, batch_size=hyperpms['batch_size'], shuffle=True)
-    testloader = torch.utils.data.DataLoader(test_data, batch_size=hyperpms['batch_size'], shuffle=True)
 
-    # Train the model
-    criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=hyperpms['lr'])
-
+    model, train_loader, test_loader, criterion, optimizer = make(modelc)
 
     # Profiling
     prof = torch.profiler.profile(
@@ -66,44 +137,25 @@ def train(config):
     # used when outputting for tensorboard
     )
 
+    total_batches = len(train_loader) * hyperpms["n_epochs"]
+    example_ct = 0  # number of examples seen
+    batch_ct = 0
+
     train_losses, test_losses = [], []
     # Training loop
     for e in range(hyperpms['n_epochs']):
         running_loss = 0
         with prof:
-            for images, labels in trainloader:
-                # Flatten MNIST images into a 784 long vector
-                images = images.to(device)
-                labels = labels.to(device)
-                optimizer.zero_grad()
-                output, _ = model(images)
-                loss = criterion(output, labels)
-                loss.backward()
-                optimizer.step()
-                prof.step()
-
+            for images, labels in train_loader:
+                loss = train_batch(images, labels, model, optimizer, criterion)
+                example_ct += len(images)
+                batch_ct += 1
                 running_loss += loss.cpu().item()
-            train_losses.append(running_loss / len(trainloader))
+            train_losses.append(running_loss / len(train_loader))
 
-            # Turn off gradients for validation
-            model.eval()
-            correct = 0
-            total = 0
-            with torch.no_grad():
-                running_loss = 0
-                for data in testloader:
-                    inputs, labels = data
-                    inputs, labels = inputs.to(device), labels.to(device)
-                    log_ps, _ = model(inputs)
-                    _, predicted = torch.max(log_ps.data, 1)
-                    total += labels.size(0)
-                    correct += (predicted == labels).sum().item()
-                    loss = criterion(log_ps, labels)
-                    running_loss += loss.cpu().item()
-                test_losses.append(running_loss / len(testloader))
+            # Log the losses
+            test_losses = test(model, test_loader, criterion, e)
 
-            model.train()
-            # if e % 1 == 0:
             log.info(f"Epoch: {e}, Training loss: {train_losses[-1]:.4f}, Validation loss: {test_losses[-1]:.4f}")
     
     
@@ -122,4 +174,5 @@ def train(config):
 
 
 if "__main__" == __name__:
-    train()
+    with wandb.init(project="probeai", entity="ferkofodor-dtu"):
+        train()
