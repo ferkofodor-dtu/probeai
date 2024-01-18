@@ -217,7 +217,7 @@ Yes, I enforced code quality and format rules using `ruff`. These rules ensure c
 > Answer:
 
 --- question 8 fill here ---
-Even with 100% code coverage, there may be scenarios or edge cases that your tests haven't captured. It's essential to complement code coverage with comprehensive testing strategies, including unit tests, integration tests, and possibly additional methods like static analysis and code reviews. 
+Even with 100% code coverage, there may be scenarios or edge cases that your tests haven't captured. It's essential to complement code coverage with comprehensive testing strategies, including unit tests, integration tests, and possibly additional methods like static analysis and code reviews.
 
 ### Question 9
 

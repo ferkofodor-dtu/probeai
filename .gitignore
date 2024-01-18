@@ -180,3 +180,4 @@ data/
 models/
 /data
 outputs
+wandb
