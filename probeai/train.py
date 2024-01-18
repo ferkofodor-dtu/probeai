@@ -1,7 +1,6 @@
 import torch
 from torch.utils.data import DataLoader
 import lightning as L
-import wandb
 from data.make_dataset import load_probeai
 from models.model import MyNeuralNet
 import hydra
