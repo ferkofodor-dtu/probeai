@@ -4,7 +4,6 @@ import click
 import torch
 from torchvision import transforms
 from torch.utils.data import Dataset
-import cv2
 
 class ProbeAIDataset(Dataset):
     def __init__(self, data, targets, transform=None):
