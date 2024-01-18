@@ -9,11 +9,6 @@ from omegaconf import OmegaConf
 from models.model import MyNeuralNet
 import wandb
 
-wandb.login()
-
-wandb.init(project="probeai")
-
-
 log = logging.getLogger(__name__)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -49,17 +44,12 @@ def make(config):
     return model, train_loader, test_loader, criterion, optimizer
 
 
-def train_log(loss, example_ct, epoch):
-    # Where the magic happens
-    wandb.log({"epoch": epoch, "loss": loss}, step=example_ct)
-    print(f"Loss after {str(example_ct).zfill(5)} examples: {loss:.3f}")
-
 
 def train_batch(images, labels, model, optimizer, criterion):
     images, labels = images.to(device), labels.to(device)
 
     # Forward pass ➡
-    outputs, _ = model(images)
+    outputs = model(images)
     loss = criterion(outputs, labels)
 
     # Backward pass ⬅
@@ -80,7 +70,7 @@ def test(model, test_loader, criterion, epoch, save_model=False):
         correct, total = 0, 0
         for images, labels in test_loader:
             inputs, labels = images.to(device), labels.to(device)
-            log_ps, _ = model(inputs)
+            log_ps = model(inputs)
             _, predicted = torch.max(log_ps.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum().item()
@@ -91,10 +81,10 @@ def test(model, test_loader, criterion, epoch, save_model=False):
             f"Accuracy of the model on the {total} "
             + f"test images: {correct / total:%}"
         )
+    wandb.log({"test_accuracy": correct / total})
 
     return running_loss / len(test_loader)
 
-    # wandb.log({"test_accuracy": correct / total})
 
     if save_model:
         # Save the model in the exchangeable ONNX format
@@ -108,6 +98,10 @@ def test(model, test_loader, criterion, epoch, save_model=False):
 # @click.option("--lr", default=1e-3, help="learning rate to use for training")
 @hydra.main(version_base=None, config_path="config", config_name="defaults.yaml")
 def train(config):
+    wandb.login()
+
+    wandb.init(project="probeai", entity="s220356")
+
     log.info(OmegaConf.to_yaml(config))
     log.info("Training day and night")
 
@@ -135,10 +129,6 @@ def train(config):
         # used when outputting for tensorboard
     )
 
-    #total_batches = len(train_loader) * config.train_conf["n_epochs"]
-    example_ct = 0  # number of examples seen
-    batch_ct = 0
-
     train_losses, test_losses = [], []
     # Training loop
     for e in range(config.train_conf["n_epochs"]):
@@ -146,18 +136,12 @@ def train(config):
         with prof:
             for images, labels in train_loader:
                 loss = train_batch(images, labels, model, optimizer, criterion)
-                example_ct += len(images)
-                batch_ct += 1
                 running_loss += loss.cpu().item()
             train_losses.append(running_loss / len(train_loader))
 
-            # Log the losses
+            wandb.log({"epoch": e, "loss": loss})
             test_loss = test(model, test_loader, criterion, e)
             test_losses.append(test_loss)
-
-            log.info(
-                f"Epoch: {e}, Training loss: {train_losses[-1]:.4f}, Validation loss: {test_losses[-1]:.4f}"
-            )
 
     # Save the model
     src = Path.cwd() / "models" / "model.pth"
