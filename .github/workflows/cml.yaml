@@ -17,13 +17,13 @@ jobs:
 
     - name: Install DVC
       run: |
-        pip install 'dvc[gs]'
+        pip install 'dvc[gdrive]'
 
     - uses: iterative/setup-dvc@v1
     - name: Get data
       run: dvc pull
       env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
 
     - name: Set up CML
       uses: iterative/setup-cml@v1
