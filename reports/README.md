@@ -163,14 +163,21 @@ Packages used:
 
 I utilized `conda` for managing dependencies in the project. The list of dependencies, including Python packages and their versions, was auto-generated and stored in the `requirements.txt` file. To replicate our development environment, a new team member would need to create a conda environment using:
 
-`conda env create --name <env_name>`
-`conda activate <env_name>`
+```markdown
+conda env create --name <env_name>
+```
+
+Then, they would need to activate the environment using:
+```markdown
+conda activate <env_name>
+```
 
 where `<env_name>` is the name of the environment.
 
 To install the packages, run:
-
-`pip install -r requirements.txt`
+```markdown
+pip install -r requirements.txt
+```
 
 ### Question 5
 
@@ -196,7 +203,7 @@ To install the packages, run:
 >
 > Answer:
 
-Yes, I enforced code quality and format rules using `ruff`. These rules ensure consistent coding practices, making the codebase more readable and maintainable. In larger projects, adherence to these standards becomes crucial as it fosters collaboration, reduces debugging time, and enhances overall project efficiency. Uniform code formatting and adherence to quality standards streamline code reviews, ease onboarding for new developers, and contribute to the long-term sustainability of the project.
+I enforced code quality and format rules using `ruff`. These rules ensure consistent coding practices, making the codebase more readable and maintainable. In larger projects, these concepts reduce debugging time, enhance overall project efficiency and readability. As such, people who are less familiar with the codebase can focus on understanding the code, rather than the formatting.
 
 ## Version control
 
@@ -215,7 +222,7 @@ Yes, I enforced code quality and format rules using `ruff`. These rules ensure c
 >
 > Answer:
 
---- question 7 fill here ---
+Initially I ran 2 tests, one for checking the data and another for checking the model. However, with my difficulties with dvc, I ended up only keeping the latter. The test is meant to assert the model's output shape.
 
 ### Question 8
 
