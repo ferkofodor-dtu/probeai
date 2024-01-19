@@ -162,15 +162,20 @@ Packages used:
 > Answer:
 
 I utilized `conda` for managing dependencies in the project. The list of dependencies, including Python packages and their versions, was auto-generated and stored in the `requirements.txt` file. To replicate our development environment, a new team member would need to create a conda environment using:
+```bash
+conda env create --name <env_name>
+```
 
-`conda env create --name <env_name>`
-`conda activate <env_name>`
-
+Then, they would need to activate the environment using:
+```bash
+conda activate <env_name>
+```
 where `<env_name>` is the name of the environment.
 
 To install the packages, run:
-
-`pip install -r requirements.txt`
+```bash
+pip install -r requirements.txt
+```
 
 ### Question 5
 
@@ -185,7 +190,69 @@ To install the packages, run:
 > *experiments.*
 > Answer:
 
---- question 5 fill here ---
+## Project structure
+
+The directory structure of the project looks like this:
+
+```txt
+
+├── Makefile             <- Unused
+├── README.md            <- The top-level README for developers using this project.
+├── data (*not included*)
+│   ├── processed  <- output of the data pipeline.
+│   ├── raw        <- The current version of the data.
+│   └── source     <- The original, immutable data dump.
+|
+├── dockerfiles       <- Dockerfiles for building docker images.
+|
+├── docs                 <- Unused
+│   │
+│   ├── index.md         <- Homepage for your documentation
+│   │
+│   ├── mkdocs.yml       <- Configuration file for mkdocs
+│   │
+│   └── source/          <- Source directory for documentation files
+│
+├── models               <- Used for locally storing models and performance metrics,
+│                          as well as for storing models in the cloud.
+│
+├── notebooks            <- Jupyter notebooks.
+│
+├── pyproject.toml       <- Project configuration file
+│
+├── reports              <- Generated analysis as HTML, PDF, LaTeX, etc.
+│   └── figures          <- Generated graphics and figures to be used in reporting
+│
+├── requirements.txt     <- The requirements file for reproducing the analysis environment
+|
+├── requirements_dev.txt <- The requirements file for reproducing the analysis environment
+│
+├── tests                <- Test files
+│
+├── probeai  <- Source code for use in this project.
+│   │
+│   ├── __init__.py      <- Makes folder a Python module
+│   │
+│   ├── data             <- Scripts to generate data
+│   │   ├── __init__.py
+│   │   └── make_dataset.py
+│   │
+│   ├── models           <- model implementations
+│   │   ├── __init__.py
+│   │   ├── model.py
+│   │
+│   ├── visualization    <- depreciated with v1.0.0
+│   │   ├── __init__.py
+│   │   └── visualize.py
+│   ├── train.py         <- script for training the model
+│   └── predict_model.py <- script for predicting from a model
+│
+└── LICENSE              <- Open-source license if one is chosen
+```
+
+Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
+a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
+started with Machine Learning Operations (MLOps).
 
 ### Question 6
 
@@ -196,7 +263,7 @@ To install the packages, run:
 >
 > Answer:
 
-Yes, I enforced code quality and format rules using `ruff`. These rules ensure consistent coding practices, making the codebase more readable and maintainable. In larger projects, adherence to these standards becomes crucial as it fosters collaboration, reduces debugging time, and enhances overall project efficiency. Uniform code formatting and adherence to quality standards streamline code reviews, ease onboarding for new developers, and contribute to the long-term sustainability of the project.
+I enforced code quality and format rules using `ruff`. These rules ensure consistent coding practices, making the codebase more readable and maintainable. In larger projects, these concepts reduce debugging time, enhance overall project efficiency and readability. As such, people who are less familiar with the codebase can focus on understanding the code, rather than the formatting.
 
 ## Version control
 
@@ -215,7 +282,7 @@ Yes, I enforced code quality and format rules using `ruff`. These rules ensure c
 >
 > Answer:
 
---- question 7 fill here ---
+Initially I ran 2 tests, one for checking the data and another for checking the model. However, with my difficulties with dvc, I ended up only keeping the latter. The test is meant to assert the model's output shape.
 
 ### Question 8
 
@@ -231,7 +298,8 @@ Yes, I enforced code quality and format rules using `ruff`. These rules ensure c
 > Answer:
 
 ![Coverage](figures/coverage.png)
-Even with 100% code coverage, there may be scenarios or edge cases that your tests haven't captured. It's essential to complement code coverage with comprehensive testing strategies, including unit tests, integration tests, and possibly additional methods like static analysis and code reviews.
+
+Even with 100% code coverage, there may be scenarios or edge cases that tests dont't captured. Code coverage measures tested code, not correctness or all possible scenarios. Logical errors, changing environments, and unforeseen use cases can still lead to bugs despite thorough testing.
 
 ### Question 9
 
@@ -248,6 +316,8 @@ Even with 100% code coverage, there may be scenarios or edge cases that your tes
 
 Yes, I did use branches. For the development of the project, I created a `dev` branch. This allowed me to work on features without affecting the main branch. Once I was done with a feature, I created a pull request to merge the branch with the main branch. This workflow helped me keep the main branch clean and stable, while allowing me to work on the various features.
 
+In general branches are useful for parallel development, allowing multiple people to work on different parts of the code simultanously. Pull requests are useful for reviewing code and ensuring that the main branch is as stable as possible. Also, with github actions, I find them even more interesting and important!
+
 ### Question 10
 
 > **Did you use DVC for managing data in your project? If yes, then how did it improve your project to have version**
@@ -261,7 +331,7 @@ Yes, I did use branches. For the development of the project, I created a `dev` b
 >
 > Answer:
 
-I adopted DVC (Data Version Control) to manage data efficiently in the project, but truth to be told, for the small amount of data I am working with it was more or a pain than a gain. It especially gets complicated with the different tokens and authentications required to access the data. However, I can without a doubt see the benefits of using DVC for larger projects with more data. It allows us to version data, track changes, and share data across teams. It also allows us to reproduce experiments and pipelines, which is crucial for the long-term sustainability of the project.
+I adopted DVC (Data Version Control) to manage data efficiently in the project, but truth to be told, for the small amount of data I am working with it was more or a pain than a gain. It especially gets complicated with the different tokens and authentications required to access the data. However, I can, without a doubt see the benefits of using DVC for larger projects with more data. It allows us to version data, track changes, and share data across teams. It also allows us to reproduce experiments and pipelines, which is crucial for the long-term sustainability of the project.
 
 ### Question 11
 
@@ -277,7 +347,7 @@ I adopted DVC (Data Version Control) to manage data efficiently in the project, 
 >
 > Answer:
 
-I have enabled pre-commit linting using the hooks
+I have gotten to the point in which I am building a docker container at every master branch push. I ha also worked on getting the CLM done, but I ran into issues with authenticating to the dvc host. Nevertheless, I have added the pytest tests as well.
 
 ## Running code and tracking experiments
 
@@ -296,7 +366,28 @@ I have enabled pre-commit linting using the hooks
 >
 > Answer:
 
---- question 12 fill here ---
+Originally I had the argparser solution, but I switched to Hydra. I used Hydra to manage hyperparameters and experiment configurations. I created a config file for each experiment, which allowed me to easily run multiple experiments with different configurations. For example, to run an experiment, I would run:
+```bash
+python train.py experiment=experiment_name
+```
+where `experiment_name` is a combination of a training and a model configuration. Now that I am starting to understand how to upscale properly the project, I think that I will be able to use Hydra more efficiently and be able to try many experiments at once.
+
+```yaml
+`train_conf`
+dataset_path: ~/probeai/data/raw
+batch_size: 4
+learning_rate: 0.01
+n_epochs: 5
+seed: 42
+```
+
+```yaml
+`model_conf`
+in_features: 1
+out_features: 2
+```
+
+Reading the TIMM documentation now, I could foresee trying different open-source image models, with different configurations to log the results and compare them. It is a very powerful tool, which I am still learning to use.
 
 ### Question 13
 
@@ -311,7 +402,7 @@ I have enabled pre-commit linting using the hooks
 >
 > Answer:
 
---- question 13 fill here ---
+To be able to replicate the experiments, I made sure to always train on the same data. Moreover, I used a seed to ensure that I fix the randomness as much as possible. As shown above, the seed is included in the config file. I also made sure to log the hyperparameters and metrics using Weights & Biases. This allowed me to easily compare experiments and reproduce them.
 
 ### Question 14
 
@@ -328,7 +419,17 @@ I have enabled pre-commit linting using the hooks
 >
 > Answer:
 
---- question 14 fill here ---
+Overall, I am tracking the following metrics:
+* **Loss**: I am tracking the training and validation loss. This allows me to monitor the training process and detect overfitting.
+* **Accuracy**: I am tracking the training and validation accuracy. This allows me to monitor the training process and detect overfitting.
+
+![W&B](./figures/lightning_wandb.png)
+
+At the end, I ended up comparing two model implementations, one with and one without Pytorch Lightning, which on paper should be the same, yet they are not. I am still figuring out why, one guess would be that the seed is not working properly.
+
+![W&B](./figures/training_wandb.png)
+
+There are other metrics that can be looked at as well. Including a confusion matrix could be interesting, maybe logging best model performance as well. There are many possibilities, once there is an understaing of the tools I am working with. wandb looks like a very powerful tool to convey information fast and efficiently, even to people who might not understand the backend at all.
 
 ### Question 15
 
@@ -343,7 +444,8 @@ I have enabled pre-commit linting using the hooks
 >
 > Answer:
 
---- question 15 fill here ---
+I have gone through various iterations of docker images, initially with the one show in the example above, where I specified hyperaparameters in the command line. Then I moved to a docker image with a config file, and now I am working on a docker image with Hydra.
+
 
 ### Question 16
 
@@ -376,9 +478,10 @@ In general I am big fan of Python's error messages. They are very informative an
 > Answer:
 
 I used the following GCP services in my project:
-- **Compute Engine**: I used Compute Engine to train my models in the cloud. I used a custom container to train my models.
-- **Cloud Storage**: I used Cloud Storage to store my data and trained models. I used a bucket to store my data and a container registry to store my trained models.
-- **Cloud Build**: I used Cloud Build to build my custom container. I used a trigger to automatically build the container whenever I pushed code to my repository.
+- **Compute Engine**: Engine is used for running virtual machines. I used it to run my training script from the exercises.
+- **Container Registry**: is used for storing Docker images. I used it to store my training image.
+- **Cloud Storage**: is used for storing data. I used it to store my training data.
+- **Cloud Build**: is used for building Docker images. I used it to build my training image.
 
 ### Question 18
 
@@ -393,7 +496,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 18 fill here ---
+I have solved the examples from class, and I haven't used special hardware for it.
 
 ### Question 19
 
@@ -402,7 +505,12 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 19 fill here ---
+I configured DVC on a GCP bucket, which can be seen in the following image:
+[DVC](./figures/cloud_bucket.png)
+
+I have not worked a lot in the cloud afterall, as I had countless of bugs elsewhere beforehand. Nevertheless, I did work through the examples of the class.
+
+
 
 ### Question 20
 
@@ -411,7 +519,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 20 fill here ---
+[cont](./figures/container_reg.png)
 
 ### Question 21
 
@@ -420,7 +528,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 21 fill here ---
+[cb](./figures/cloud_build.png)
 
 ### Question 22
 
@@ -436,7 +544,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 22 fill here ---
+I have not gotten to the deployment. This is where I lost the last week due to illness. Everything until deployment I have solved, mostly twice, but I do miss the last few modules.
 
 ### Question 23
 
@@ -451,7 +559,8 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 23 fill here ---
+I haven't monitored either, as I did not deploy.
+
 
 ### Question 24
 
@@ -465,7 +574,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 24 fill here ---
+The course examples were very small, so I ended up using less than $1 for now.
 
 ## Overall discussion of project
 
@@ -500,7 +609,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 26 fill here ---
+Debugging, without a doubt. I have seen beginners luck in action throughout the course, as in, while trying the examples, things were going okay, but then when having to implement on my code, things were falling apart from all angles. In addition, having a CUDA-compatible, yet very weak GPU, installing all the CUDA dependencies in dockerfiles makes things quite time consuming, especially when in the end result the build fails due to opencv. Apparently, the python cv2 is not working well with docker. Another scenario was when wandb changed it's host setting to localhost, which funnily enough does not return an error code, it freezes in init. I had countless of weird errors, where not even Google, let alone ChatGPT was really helpful. Running in WSL is also something new, which comes with it's own limitations. Afterall, for me this course was a change in thinking, as I have never worked with any of these tools before. I was somewhat familiar with environments, but the rest with such structure, I have never seen before. It was a a lot of fun and a lot of work! I am glad I got to learn a lot of new things, and I am eager to apply this knowledge in the my future projects.
 
 ### Question 27
 
