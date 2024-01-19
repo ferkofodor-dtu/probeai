@@ -190,7 +190,67 @@ pip install -r requirements.txt
 > *experiments.*
 > Answer:
 
---- question 5 fill here ---
+## Project structure
+
+The directory structure of the project looks like this:
+
+```txt
+
+├── Makefile             <- Unused
+├── README.md            <- The top-level README for developers using this project.
+├── data (*not included*)
+│   ├── processed  <- output of the data pipeline.
+│   ├── raw        <- The current version of the data.
+│   └── source     <- The original, immutable data dump.
+|
+├── docs                 <- Unused
+│   │
+│   ├── index.md         <- Homepage for your documentation
+│   │
+│   ├── mkdocs.yml       <- Configuration file for mkdocs
+│   │
+│   └── source/          <- Source directory for documentation files
+│
+├── models               <- Used for locally storing models and performance metrics,
+│                          as well as for storing models in the cloud.
+│
+├── notebooks            <- Jupyter notebooks.
+│
+├── pyproject.toml       <- Project configuration file
+│
+├── reports              <- Generated analysis as HTML, PDF, LaTeX, etc.
+│   └── figures          <- Generated graphics and figures to be used in reporting
+│
+├── requirements.txt     <- The requirements file for reproducing the analysis environment
+|
+├── requirements_dev.txt <- The requirements file for reproducing the analysis environment
+│
+├── tests                <- Test files
+│
+├── probeai  <- Source code for use in this project.
+│   │
+│   ├── __init__.py      <- Makes folder a Python module
+│   │
+│   ├── data             <- Scripts to generate data
+│   │   ├── __init__.py
+│   │   └── make_dataset.py
+│   │
+│   ├── models           <- model implementations
+│   │   ├── __init__.py
+│   │   ├── model.py
+│   │
+│   ├── visualization    <- depreciated with v1.0.0
+│   │   ├── __init__.py
+│   │   └── visualize.py
+│   ├── train.py         <- script for training the model
+│   └── predict_model.py <- script for predicting from a model
+│
+└── LICENSE              <- Open-source license if one is chosen
+```
+
+Created using [mlops_template](https://github.com/SkafteNicki/mlops_template),
+a [cookiecutter template](https://github.com/cookiecutter/cookiecutter) for getting
+started with Machine Learning Operations (MLOps).
 
 ### Question 6
 
@@ -236,7 +296,8 @@ Initially I ran 2 tests, one for checking the data and another for checking the 
 > Answer:
 
 ![Coverage](figures/coverage.png)
-Even with 100% code coverage, there may be scenarios or edge cases that your tests haven't captured. It's essential to complement code coverage with comprehensive testing strategies, including unit tests, integration tests, and possibly additional methods like static analysis and code reviews.
+
+Even with 100% code coverage, there may be scenarios or edge cases that tests dont't captured. Code coverage measures tested code, not correctness or all possible scenarios. Logical errors, changing environments, and unforeseen use cases can still lead to bugs despite thorough testing.
 
 ### Question 9
 
@@ -253,6 +314,8 @@ Even with 100% code coverage, there may be scenarios or edge cases that your tes
 
 Yes, I did use branches. For the development of the project, I created a `dev` branch. This allowed me to work on features without affecting the main branch. Once I was done with a feature, I created a pull request to merge the branch with the main branch. This workflow helped me keep the main branch clean and stable, while allowing me to work on the various features.
 
+In general branches are useful for parallel development, allowing multiple people to work on different parts of the code simultanously. Pull requests are useful for reviewing code and ensuring that the main branch is as stable as possible. Also, with github actions, I find them even more interesting and important!
+
 ### Question 10
 
 > **Did you use DVC for managing data in your project? If yes, then how did it improve your project to have version**
@@ -266,7 +329,7 @@ Yes, I did use branches. For the development of the project, I created a `dev` b
 >
 > Answer:
 
-I adopted DVC (Data Version Control) to manage data efficiently in the project, but truth to be told, for the small amount of data I am working with it was more or a pain than a gain. It especially gets complicated with the different tokens and authentications required to access the data. However, I can without a doubt see the benefits of using DVC for larger projects with more data. It allows us to version data, track changes, and share data across teams. It also allows us to reproduce experiments and pipelines, which is crucial for the long-term sustainability of the project.
+I adopted DVC (Data Version Control) to manage data efficiently in the project, but truth to be told, for the small amount of data I am working with it was more or a pain than a gain. It especially gets complicated with the different tokens and authentications required to access the data. However, I can, without a doubt see the benefits of using DVC for larger projects with more data. It allows us to version data, track changes, and share data across teams. It also allows us to reproduce experiments and pipelines, which is crucial for the long-term sustainability of the project.
 
 ### Question 11
 
@@ -282,7 +345,7 @@ I adopted DVC (Data Version Control) to manage data efficiently in the project, 
 >
 > Answer:
 
-I have enabled pre-commit linting using the hooks
+I have gotten to the point in which I am building a docker container at every master branch push. I ha also worked on getting the CLM done, but I ran into issues with authenticating to the dvc host. Nevertheless, I have added the pytest tests as well.
 
 ## Running code and tracking experiments
 
@@ -301,7 +364,27 @@ I have enabled pre-commit linting using the hooks
 >
 > Answer:
 
---- question 12 fill here ---
+Originally I had the argparser solution, but I switched to Hydra. I used Hydra to manage hyperparameters and experiment configurations. I created a config file for each experiment, which allowed me to easily run multiple experiments with different configurations. For example, to run an experiment, I would run:
+```bash
+python train.py experiment=experiment_name
+```
+where `experiment_name` is the name of the experiment.
+
+It is important to note that an experiment is a combination of 2 config files: `model_conf` and `train_conf`.
+
+```yaml
+`train_conf`
+dataset_path: ~/probeai/data/raw
+batch_size: 4
+learning_rate: 0.01
+n_epochs: 5
+seed: 42
+```
+
+```yaml
+in_features: 1
+out_features: 2
+```
 
 ### Question 13
 
