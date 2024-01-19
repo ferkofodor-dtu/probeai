@@ -1,32 +1,40 @@
-name: model-training
+name: ML Prediction Workflow
+
 on: [push]
+
 jobs:
-  run:
+  run-prediction:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Authenticate too Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v0
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
 
-      - uses: actions/setup-python@v4
-      - uses: iterative/setup-cml@v1
+    - name: Set up CML
+      uses: iterative/setup-cml@v1
 
-      - name: Train model
-        env:
-          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Install requirements
-          pip install -r requirements.txt
-          pip install "dvc[gs]"
+    - name: Install DVC
+      run: |
+        pip install 'dvc[gs]'
 
-          # Pull data & run-cache from S3 and reproduce pipeline
-          dvc pull
+    - name: Pull data with DVC
+      run: |
+        dvc pull
 
-          python probeai/train.py
+    - name: Run prediction model
+      env:
+        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Install requirements
+        pip install -r requirements.txt
 
-          cat ./reports/classification_report.txt >> report.md
-          echo "![](./reports/figures/confusion_matrix.png)" >> report.md
-          cml comment create report.md
+        python probeai/train.py
+
+        cat ./reports/classification_report.txt >> report.md
+        echo "![](./reports/figures/confusion_matrix.png)" >> report.md
+        cml comment create report.md
