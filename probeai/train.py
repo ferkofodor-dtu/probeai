@@ -1,47 +1,10 @@
-import torch
 from torch.utils.data import DataLoader
 import lightning as L
 from data.make_dataset import load_probeai
-from models.model import MyNeuralNet
+from models.model import MyLightningModel
 import hydra
-from torchmetrics.classification import Accuracy
 from lightning.pytorch.loggers import WandbLogger
-
-
-class MyLightningModel(L.LightningModule):
-    def __init__(self, config):
-        super(MyLightningModel, self).__init__()
-        self.config = config
-        self.model = MyNeuralNet(config.model_conf["in_features"], config.model_conf["out_features"])
-        self.criterion = torch.nn.CrossEntropyLoss()
-        self.accuracy = Accuracy(task="binary")
-
-    def forward(self, x):
-        return self.model(x)
-
-    def training_step(self, batch, batch_idx):
-        # "batch" is the output of the training data loader.
-        imgs, labels = batch
-        preds = self.model(imgs)
-        loss = self.criterion(preds, labels)
-        acc = (preds.argmax(dim=-1) == labels).float().mean()
-
-        # Logs the accuracy per epoch to tensorboard (weighted average over batches)
-        self.log("train_acc", acc, on_step=False, on_epoch=True)
-        self.log("train_loss", loss)
-        return loss  # Return tensor to call ".backward" on
-
-    def validation_step(self, batch, batch_idx):
-        images, labels = batch
-        preds = self(images)
-        loss = self.criterion(preds, labels)
-        acc = (preds.argmax(dim=-1) == labels).float().mean()
-        self.log("val_loss", loss)
-        self.log("val_acc", acc)
-
-    def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.train_conf["learning_rate"])
-        return optimizer
+from predict_model import predict
 
 
 def make_loader(dataset, batch_size, shuffle=True):
@@ -78,15 +41,17 @@ def train(config):
 
     # Train the model
     trainer.fit(model, train_loader, test_loader)
+
+    # save model
+    trainer.save_checkpoint("./models/best_model.ckpt", weights_only=True)
+
     model = MyLightningModel.load_from_checkpoint(
-        trainer.checkpoint_callback.best_model_path,
+        "./models/best_model.ckpt",
         config=config,
     )
 
-    # save model
-    torch.save(model.state_dict(), "model.pth")
-
-    return model
+    # Test the model
+    predict(model, test_loader)
 
 
 @hydra.main(version_base=None, config_path="config", config_name="defaults.yaml")

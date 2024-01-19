@@ -1,5 +1,43 @@
 import torch
 import torch.nn as nn
+from torchmetrics.classification import Accuracy
+import lightning as L
+
+
+class MyLightningModel(L.LightningModule):
+    def __init__(self, config):
+        super(MyLightningModel, self).__init__()
+        self.config = config
+        self.model = MyNeuralNet(config.model_conf["in_features"], config.model_conf["out_features"])
+        self.criterion = torch.nn.CrossEntropyLoss()
+        self.accuracy = Accuracy(task="binary")
+
+    def forward(self, x):
+        return self.model(x)
+
+    def training_step(self, batch, batch_idx):
+        # "batch" is the output of the training data loader.
+        imgs, labels = batch
+        preds = self.model(imgs)
+        loss = self.criterion(preds, labels)
+        acc = (preds.argmax(dim=-1) == labels).float().mean()
+
+        # Logs the accuracy per epoch to tensorboard (weighted average over batches)
+        self.log("train_acc", acc, on_step=False, on_epoch=True)
+        self.log("train_loss", loss)
+        return loss  # Return tensor to call ".backward" on
+
+    def validation_step(self, batch, batch_idx):
+        images, labels = batch
+        preds = self(images)
+        loss = self.criterion(preds, labels)
+        acc = (preds.argmax(dim=-1) == labels).float().mean()
+        self.log("val_loss", loss)
+        self.log("val_acc", acc)
+
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.train_conf["learning_rate"])
+        return optimizer
 
 
 class MyNeuralNet(nn.Module):
