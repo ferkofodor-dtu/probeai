@@ -5,18 +5,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
       - uses: actions/setup-python@v4
       - uses: iterative/setup-cml@v1
+
       - name: Train model
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         run: |
           # Install requirements
           pip install -r requirements.txt
           pip install "dvc[gs]"
+
           # Pull data & run-cache from S3 and reproduce pipeline
-          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
           dvc pull
 
           python probeai/train.py
