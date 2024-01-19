@@ -1,17 +1,18 @@
 name: Docker Image CI
 
 on:
-    push:
-        branches: [ master ]
+  push:
+    branches: [ master, main ]
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
+  build:
 
-        steps:
-        - name: Build the Docker image
-        uses: actions/checkout@v2
-        run: |
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Build Docker Image
+      uses: actions/checkout@v2
+      run: |
             echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login \
                 -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin docker.io
             docker build . --file Dockerfile \
