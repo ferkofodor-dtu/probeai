@@ -6,7 +6,9 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
+      with:
+          node-version: 16
 
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v1
@@ -22,7 +24,7 @@ jobs:
 
     - name: Pull data with DVC
       run: |
-        dvc pull
+        dvc pull -v
 
     - name: Run prediction model
       env:
