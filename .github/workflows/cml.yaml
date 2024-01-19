@@ -10,7 +10,7 @@ jobs:
       with:
           node-version: 16
 
-    - name: Authenticate to Google Cloud
+    - name: Authenticate to Google Drive
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
@@ -20,7 +20,7 @@ jobs:
 
     - name: Install DVC
       run: |
-        pip install 'dvc[gs]'
+        pip install 'dvc[gdrive]'
 
     - uses: iterative/setup-dvc@v1
     - name: Get data
