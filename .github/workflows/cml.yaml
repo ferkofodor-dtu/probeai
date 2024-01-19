@@ -22,9 +22,11 @@ jobs:
       run: |
         pip install 'dvc[gs]'
 
-    - name: Pull data with DVC
-      run: |
-        dvc pull -v
+    - uses: iterative/setup-dvc@v1
+    - name: Get data
+      run: dvc pull
+      env:
+        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
 
     - name: Run prediction model
       env:
