@@ -1,54 +1,54 @@
-name: model-training
-on: [push]
-jobs:
-  run-prediction:
-    runs-on: ubuntu-latest
+# name: model-training
+# on: [push]
+# jobs:
+#   run-prediction:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-      with:
-          node-version: 16
+#     steps:
+#     - name: Checkout repository
+#       uses: actions/checkout@v3
+#       with:
+#           node-version: 16
 
-    # - name: Authenticate to Google Drive
-    #   uses: google-github-actions/auth@v1
-    #   with:
-    #     credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+#     # - name: Authenticate to Google Drive
+#     #   uses: google-github-actions/auth@v1
+#     #   with:
+#     #     credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
-    - name: Install DVC
-      run: |
-        pip install 'dvc[gdrive]'
-        python -m pip install --upgrade pip
-        pip install -U pyopenssl cryptography
+#     - name: Install DVC
+#       run: |
+#         pip install 'dvc[gdrive]'
+#         python -m pip install --upgrade pip
+#         pip install -U pyopenssl cryptography
 
-    # copy the credentials file to the runner
-    - name: Copy credentials file
-      run: |
-        mkdir -p $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/
-        echo "$GOOGLE_APPLICATION_CREDENTIALS2" > $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/default.json
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
+#     # copy the credentials file to the runner
+#     - name: Copy credentials file
+#       run: |
+#         mkdir -p $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/
+#         echo "$GOOGLE_APPLICATION_CREDENTIALS2" > $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/default.json
+#       env:
+#         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
 
-    - uses: iterative/setup-dvc@v1
-    - name: Get data
-      run: dvc pull -v
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
+#     - uses: iterative/setup-dvc@v1
+#     - name: Get data
+#       run: dvc pull -v
+#       env:
+#         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
 
-    - name: Set up CML
-      uses: iterative/setup-cml@v1
+#     - name: Set up CML
+#       uses: iterative/setup-cml@v1
 
-    - name: Run prediction model
-      env:
-        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-          # Install requirements
+#     - name: Run prediction model
+#       env:
+#         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       run: |
+#           # Install requirements
 
 
-          pip install -r requirements.txt
+#           pip install -r requirements.txt
 
-          python probeai/train.py
+#           python probeai/train.py
 
-          cat ./reports/classification_report.txt >> report.md
-          echo "![](./reports/figures/confusion_matrix.png)" >> report.md
-          cml comment create report.md
+#           cat ./reports/classification_report.txt >> report.md
+#           echo "![](./reports/figures/confusion_matrix.png)" >> report.md
+#           cml comment create report.md
