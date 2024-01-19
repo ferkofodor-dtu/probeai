@@ -33,7 +33,6 @@ class MyNeuralNet(nn.Module):
         self.fc2 = nn.Linear(512, 128)
         self.out = nn.Linear(128, out_features)
 
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model.
 
@@ -55,6 +54,5 @@ class MyNeuralNet(nn.Module):
         x = self.relu3(self.fc1(x))
         x = self.relu3(self.fc2(x))
         x = self.out(x)
-
 
         return x
