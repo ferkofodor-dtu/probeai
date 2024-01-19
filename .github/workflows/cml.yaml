@@ -10,10 +10,10 @@ jobs:
       with:
           node-version: 16
 
-    - name: Authenticate to Google Drive
-      uses: google-github-actions/auth@v1
-      with:
-        credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
+    # - name: Authenticate to Google Drive
+    #   uses: google-github-actions/auth@v1
+    #   with:
+    #     credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
 
     - name: Set up CML
       uses: iterative/setup-cml@v1
