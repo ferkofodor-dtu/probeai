@@ -440,7 +440,8 @@ There are other metrics that can be looked at as well. Including a confusion mat
 >
 > Answer:
 
---- question 15 fill here ---
+I have gone through various iterations of docker images, initially with the one show in the example above, where I specified hyperaparameters in the command line. Then I moved to a docker image with a config file, and now I am working on a docker image with Hydra.
+
 
 ### Question 16
 
@@ -473,9 +474,10 @@ In general I am big fan of Python's error messages. They are very informative an
 > Answer:
 
 I used the following GCP services in my project:
-- **Compute Engine**: I used Compute Engine to train my models in the cloud. I used a custom container to train my models.
-- **Cloud Storage**: I used Cloud Storage to store my data and trained models. I used a bucket to store my data and a container registry to store my trained models.
-- **Cloud Build**: I used Cloud Build to build my custom container. I used a trigger to automatically build the container whenever I pushed code to my repository.
+- **Compute Engine**: Engine is used for running virtual machines. I used it to run my training script from the exercises.
+- **Container Registry**: is used for storing Docker images. I used it to store my training image.
+- **Cloud Storage**: is used for storing data. I used it to store my training data.
+- **Cloud Build**: is used for building Docker images. I used it to build my training image.
 
 ### Question 18
 
@@ -490,7 +492,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
-My project
+I have solved the examples from class, and I haven't used special hardware for it.
 
 ### Question 19
 
