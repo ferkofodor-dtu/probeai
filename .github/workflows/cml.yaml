@@ -11,7 +11,7 @@ jobs:
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v1
       with:
-        credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
 
     - name: Set up CML
       uses: iterative/setup-cml@v1
