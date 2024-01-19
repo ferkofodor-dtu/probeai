@@ -203,6 +203,8 @@ The directory structure of the project looks like this:
 │   ├── raw        <- The current version of the data.
 │   └── source     <- The original, immutable data dump.
 |
+├── dockerfiles       <- Dockerfiles for building docker images.
+|
 ├── docs                 <- Unused
 │   │
 │   ├── index.md         <- Homepage for your documentation
@@ -384,6 +386,8 @@ seed: 42
 in_features: 1
 out_features: 2
 ```
+
+Reading the TIMM documentation now, I could foresee trying different open-source image models, with different configurations to log the results and compare them. It is a very powerful tool, which I am still learning to use.
 
 ### Question 13
 
