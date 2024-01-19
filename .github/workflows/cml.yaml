@@ -13,10 +13,7 @@ jobs:
     # - name: Authenticate to Google Drive
     #   uses: google-github-actions/auth@v1
     #   with:
-    #     credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
-
-    - name: Set up CML
-      uses: iterative/setup-cml@v1
+    #     credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
 
     - name: Install DVC
       run: |
@@ -26,7 +23,10 @@ jobs:
     - name: Get data
       run: dvc pull
       env:
-        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+
+    - name: Set up CML
+      uses: iterative/setup-cml@v1
 
     - name: Run prediction model
       env:
