@@ -16,8 +16,8 @@ jobs:
           pip install -r requirements.txt
           pip install "dvc[gs]"
           # Pull data & run-cache from S3 and reproduce pipeline
-          dvc pull data --run-cache
-          dvc repro
+          gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS
+          dvc pull
 
           python probeai/train.py
 
