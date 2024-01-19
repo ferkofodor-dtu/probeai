@@ -181,3 +181,4 @@ models/
 /data
 outputs
 wandb
+/probai-lightning

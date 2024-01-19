@@ -57,27 +57,27 @@ end of the project.
 * [*] Fill out the `make_dataset.py` file such that it downloads whatever data you need and
 * [*] Add a model file and a training script and get that running
 * [*] Remember to fill out the `requirements.txt` file with whatever dependencies that you are using
-* [ ] Remember to comply with good coding practices (`pep8`) while doing the project
+* [*] Remember to comply with good coding practices (`pep8`) while doing the project
 * [ ] Do a bit of code typing and remember to document essential parts of your code
 * [*] Setup version control for your data or part of your data
 * [*] Construct one or multiple docker files for your code
-* [ ] Build the docker files locally and make sure they work as intended
+* [*] Build the docker files locally and make sure they work as intended
 * [*] Write one or multiple configurations files for your experiments
 * [*] Used Hydra to load the configurations and manage your hyperparameters
 * [*] When you have something that works somewhat, remember at some point to to some profiling and see if
       you can optimize your code
 * [*] Use Weights & Biases to log training progress and other important metrics/artifacts in your code. Additionally,
       consider running a hyperparameter optimization sweep.
-* [ ] Use Pytorch-lightning (if applicable) to reduce the amount of boilerplate in your code
+* [*] Use Pytorch-lightning (if applicable) to reduce the amount of boilerplate in your code
 
 ### Week 2
 
 * [*] Write unit tests related to the data part of your code
 * [*] Write unit tests related to model construction and or model training
 * [*] Calculate the coverage.
-* [ ] Get some continuous integration running on the github repository
-* [ ] Create a data storage in GCP Bucket for you data and preferable link this with your data version control setup
-* [ ] Create a trigger workflow for automatically building your docker images
+* [*] Get some continuous integration running on the github repository
+* [*] Create a data storage in GCP Bucket for you data and preferable link this with your data version control setup
+* [*] Create a trigger workflow for automatically building your docker images
 * [ ] Get your model training in GCP using either the Engine or Vertex AI
 * [ ] Create a FastAPI application that can do inference using your model
 * [ ] If applicable, consider deploying the model locally using torchserve
@@ -94,9 +94,9 @@ end of the project.
 
 ### Additional
 
-* [ ] Revisit your initial project description. Did the project turn out as you wanted?
-* [ ] Make sure all group members have a understanding about all parts of the project
-* [ ] Uploaded all your code to github
+* [*] Revisit your initial project description. Did the project turn out as you wanted?
+* [*] Make sure all group members have a understanding about all parts of the project
+* [*] Uploaded all your code to github
 
 ## Group information
 
@@ -344,7 +344,7 @@ I adopted DVC (Data Version Control) to manage data efficiently in the project. 
 >
 > Answer:
 
-In general I am big fan of Python's error messages. They are very informative and help me debug my code. I also used `pdb` to debug my code. I used `cProfile` to profile my code. In addition, I used the tensorboard profiler as well. These tools helped me identify bottlenecks in my code and optimize it accordingly.
+In general I am big fan of Python's error messages. They are very informative and help me debug my code. I also used `pdb` to debug my code, but mainly for the exercise. I used `cProfile` to profile my code. In addition, I used the tensorboard profiler as well. These tools helped me identify bottlenecks in my code and optimize it accordingly.
 
 ## Working in the cloud
 
@@ -365,7 +365,6 @@ I used the following GCP services in my project:
 - **Compute Engine**: I used Compute Engine to train my models in the cloud. I used a custom container to train my models.
 - **Cloud Storage**: I used Cloud Storage to store my data and trained models. I used a bucket to store my data and a container registry to store my trained models.
 - **Cloud Build**: I used Cloud Build to build my custom container. I used a trigger to automatically build the container whenever I pushed code to my repository.
-- **Cloud Run**: I used Cloud Run to deploy my model. I used a trigger to automatically deploy the model whenever I pushed code to my repository.
 
 ### Question 18
 
@@ -504,4 +503,4 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 27 fill here ---
+Student s220356 is responsible for all the work done in this project.
