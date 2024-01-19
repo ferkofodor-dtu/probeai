@@ -12,9 +12,7 @@ class MyLightningModel(L.LightningModule):
     def __init__(self, config):
         super(MyLightningModel, self).__init__()
         self.config = config
-        self.model = MyNeuralNet(
-            config.model_conf['in_features'], config.model_conf['out_features']
-        )
+        self.model = MyNeuralNet(config.model_conf["in_features"], config.model_conf["out_features"])
         self.criterion = torch.nn.CrossEntropyLoss()
         self.accuracy = Accuracy(task="binary")
 
@@ -42,9 +40,7 @@ class MyLightningModel(L.LightningModule):
         self.log("val_acc", acc)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(
-            self.model.parameters(), lr=self.config.train_conf["learning_rate"]
-        )
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config.train_conf["learning_rate"])
         return optimizer
 
 
@@ -61,8 +57,8 @@ def make_loader(dataset, batch_size, shuffle=True):
 def train(config):
     # Make the data
     train, test = load_probeai()
-    train_loader = make_loader(train, batch_size=config.train_conf['batch_size'])
-    test_loader = make_loader(test, batch_size=config.train_conf['batch_size'], shuffle=False)
+    train_loader = make_loader(train, batch_size=config.train_conf["batch_size"])
+    test_loader = make_loader(test, batch_size=config.train_conf["batch_size"], shuffle=False)
 
     # Initialize PyTorch Lightning model
     model = MyLightningModel(config)
@@ -72,31 +68,30 @@ def train(config):
 
     # Initialize PyTorch Lightning trainer
     trainer = L.Trainer(
-        max_epochs=config.train_conf['n_epochs'],
+        max_epochs=config.train_conf["n_epochs"],
         profiler="simple",
-        accelerator='auto',
+        accelerator="auto",
         logger=wandb_logger,
         log_every_n_steps=27,
-        enable_checkpointing=True
+        enable_checkpointing=True,
     )
 
     # Train the model
     trainer.fit(model, train_loader, test_loader)
     model = MyLightningModel.load_from_checkpoint(
-            trainer.checkpoint_callback.best_model_path,
-            config=config,
-        )
+        trainer.checkpoint_callback.best_model_path,
+        config=config,
+    )
 
     # save model
-    torch.save(model.state_dict(), 'model.pth')
+    torch.save(model.state_dict(), "model.pth")
 
     return model
 
 
-
 @hydra.main(version_base=None, config_path="config", config_name="defaults.yaml")
 def hydra_train(config):
-    L.seed_everything(config.train_conf['seed'])
+    L.seed_everything(config.train_conf["seed"])
     train(config)
 
 

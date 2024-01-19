@@ -5,6 +5,7 @@ import torch
 from torchvision import transforms
 from torch.utils.data import Dataset
 
+
 class ProbeAIDataset(Dataset):
     def __init__(self, data, targets, transform=None):
         self.data = data
@@ -38,8 +39,11 @@ def load_probeai(src=None):
     test_labels = torch.load(src / "test_labels.pt")
 
     transform = transforms.Compose(
-        [transforms.ToTensor(),
-        transforms.Normalize((0.0), (1.0)),])
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.0), (1.0)),
+        ]
+    )
 
     train_dataset = ProbeAIDataset(train_data, train_labels, transform=transform)
     test_dataset = ProbeAIDataset(test_data, test_labels, transform=transform)

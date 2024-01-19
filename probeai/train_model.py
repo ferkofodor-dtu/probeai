@@ -31,18 +31,13 @@ def make(config):
     test_loader = make_loader(test, batch_size=config.train_conf["batch_size"])
 
     # Make the model
-    model = MyNeuralNet(
-        config.model_conf["in_features"], config.model_conf["out_features"]
-    ).to(device)
+    model = MyNeuralNet(config.model_conf["in_features"], config.model_conf["out_features"]).to(device)
 
     # Make the loss and optimizer
     criterion = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(
-        model.parameters(), lr=config.train_conf["learning_rate"]
-    )
+    optimizer = torch.optim.Adam(model.parameters(), lr=config.train_conf["learning_rate"])
 
     return model, train_loader, test_loader, criterion, optimizer
-
 
 
 def train_batch(images, labels, model, optimizer, criterion):
@@ -77,14 +72,10 @@ def test(model, test_loader, criterion, epoch, save_model=False):
             loss = criterion(log_ps, labels)
             running_loss += loss.cpu().item()
 
-        print(
-            f"Accuracy of the model on the {total} "
-            + f"test images: {correct / total:%}"
-        )
+        print(f"Accuracy of the model on the {total} " + f"test images: {correct / total:%}")
     wandb.log({"test_accuracy": correct / total})
 
     return running_loss / len(test_loader)
-
 
 
 # @click.command()
@@ -102,7 +93,6 @@ def train(config):
 
     torch.manual_seed(config.train_conf["seed"])
 
-
     model, train_loader, test_loader, criterion, optimizer = make(config)
 
     # Profiling
@@ -119,7 +109,7 @@ def train(config):
         # and on_trace_ready (when set) is called;
         # the cycle repeats starting with the next step
         schedule=torch.profiler.schedule(wait=1, warmup=1, active=2, repeat=1),
-        on_trace_ready=torch.profiler.tensorboard_trace_handler("./log/profile")
+        on_trace_ready=torch.profiler.tensorboard_trace_handler("./log/profile"),
         # used when outputting for tensorboard
     )
 

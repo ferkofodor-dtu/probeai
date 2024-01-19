@@ -9,9 +9,7 @@ def visualize_tsne(features, labels, save_path):
 
     # Plot the 2D t-SNE visualization
     plt.figure(figsize=(10, 8))
-    plt.scatter(
-        reduced_features[:, 0], reduced_features[:, 1], c=labels, cmap="viridis"
-    )
+    plt.scatter(reduced_features[:, 0], reduced_features[:, 1], c=labels, cmap="viridis")
     plt.title("t-SNE Visualization of Intermediate Features")
     plt.xlabel("Dimension 1")
     plt.ylabel("Dimension 2")
