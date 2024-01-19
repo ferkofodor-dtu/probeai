@@ -129,7 +129,20 @@ s220356
 >
 > Answer:
 
---- question 3 fill here ---
+Packages used:
+* PyTorch Lightning:
+      * PyTorch Lightning is a lightweight wrapper for PyTorch that simplifies the training process. It also provides a number of useful features, including automatic checkpointing, logging, and early stopping.
+* Hydra:
+      * Hydra's configuration system is particularly useful for managing hyperparameters and experiment configurations, which is why I used it in this project.
+* Weights & Biases:
+      * Allows us to log and visualize metrics, hyperparameters, and artifacts. It also provides a number of useful features, including hyperparameter sweeps, model versioning, and experiment comparison.
+* DVC:
+      * DVC is a version control system for data science projects. It allows data versioning, data pipelines, and data sharing. These features helped me streamline the data management process.
+* Docker:
+      * Docker is a containerization platform. It allows us to package our code and its dependencies into a container, making it portable and reproducible.
+* CML:
+      * CML is a CI/CD tool for machine learning projects. It allows us to automate the testing and deployment of our models. Here it is used for a workflow trigger, and reports.
+
 
 ## Coding environment
 
@@ -148,15 +161,16 @@ s220356
 >
 > Answer:
 
-We utilized `conda` for managing dependencies in our project. The list of dependencies, including Python packages and their versions, was auto-generated and stored in the `environment.yaml` file. To replicate our development environment, a new team member would need to create a conda environment using:
+I utilized `conda` for managing dependencies in the project. The list of dependencies, including Python packages and their versions, was auto-generated and stored in the `requirements.txt` file. To replicate our development environment, a new team member would need to create a conda environment using:
 
-`conda env create -f environment.yml`
-
-This command installs all the required packages and ensures version consistency. Additionally, team members can activate the environment with:
-
+`conda env create --name <env_name>`
 `conda activate <env_name>`
 
-where `<env_name>` is the name of the environment. This ensures that the correct packages are used when running the code.
+where `<env_name>` is the name of the environment.
+
+To install the packages, run:
+
+`pip install -r requirements.txt`
 
 ### Question 5
 
@@ -216,7 +230,7 @@ Yes, I enforced code quality and format rules using `ruff`. These rules ensure c
 >
 > Answer:
 
---- question 8 fill here ---
+![Coverage](figures/coverage.png)
 Even with 100% code coverage, there may be scenarios or edge cases that your tests haven't captured. It's essential to complement code coverage with comprehensive testing strategies, including unit tests, integration tests, and possibly additional methods like static analysis and code reviews.
 
 ### Question 9
@@ -232,7 +246,7 @@ Even with 100% code coverage, there may be scenarios or edge cases that your tes
 >
 > Answer:
 
-Yes, I did use branches. For the development of the project, I created a `dev` branch. This allowed me to work on features without affecting the main branch. Once I was done with a feature, I created a pull request to merge the branch with the main branch. This workflow helped me keep the main branch clean and stable, while allowing me to work on multiple features.
+Yes, I did use branches. For the development of the project, I created a `dev` branch. This allowed me to work on features without affecting the main branch. Once I was done with a feature, I created a pull request to merge the branch with the main branch. This workflow helped me keep the main branch clean and stable, while allowing me to work on the various features.
 
 ### Question 10
 
@@ -247,7 +261,7 @@ Yes, I did use branches. For the development of the project, I created a `dev` b
 >
 > Answer:
 
-I adopted DVC (Data Version Control) to manage data efficiently in the project. DVC streamlined the version control of large datasets, promoting reproducibility and collaboration. By separating data from code, DVC enhanced experiment consistency and traceability, simplifying sharing and replication. Its lightweight nature preserved data integrity while minimizing storage in the version control system. This approach ensured reliable data pipelines and facilitated seamless tracking of changes over time. DVC's significance was particularly evident in scenarios with evolving large datasets, where systematic tracking and documentation of data changes were essential.
+I adopted DVC (Data Version Control) to manage data efficiently in the project, but truth to be told, for the small amount of data I am working with it was more or a pain than a gain. It especially gets complicated with the different tokens and authentications required to access the data. However, I can without a doubt see the benefits of using DVC for larger projects with more data. It allows us to version data, track changes, and share data across teams. It also allows us to reproduce experiments and pipelines, which is crucial for the long-term sustainability of the project.
 
 ### Question 11
 
@@ -263,7 +277,7 @@ I adopted DVC (Data Version Control) to manage data efficiently in the project. 
 >
 > Answer:
 
---- question 11 fill here ---
+I have enabled pre-commit linting using the hooks
 
 ## Running code and tracking experiments
 
