@@ -24,8 +24,10 @@ jobs:
     # copy the credentials file to the runner
     - name: Copy credentials file
       run: |
-        mkdir -p $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/
-        cp ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/default.json
+        mkdir -p ./.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/
+        echo "$GOOGLE_APPLICATION_CREDENTIALS2" > ./.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/default.json
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
 
     - uses: iterative/setup-dvc@v1
     - name: Get data
