@@ -21,6 +21,7 @@ jobs:
     - name: Install DVC
       run: |
         pip install 'dvc[gdrive]'
+        pip install 'dvc[gs]'
 
     - uses: iterative/setup-dvc@v1
     - name: Get data
