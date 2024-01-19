@@ -162,20 +162,18 @@ Packages used:
 > Answer:
 
 I utilized `conda` for managing dependencies in the project. The list of dependencies, including Python packages and their versions, was auto-generated and stored in the `requirements.txt` file. To replicate our development environment, a new team member would need to create a conda environment using:
-
-```markdown
+```bash
 conda env create --name <env_name>
 ```
 
 Then, they would need to activate the environment using:
-```markdown
+```bash
 conda activate <env_name>
 ```
-
 where `<env_name>` is the name of the environment.
 
 To install the packages, run:
-```markdown
+```bash
 pip install -r requirements.txt
 ```
 
