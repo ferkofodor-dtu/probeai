@@ -20,14 +20,13 @@ jobs:
 
     - name: Install DVC
       run: |
-        pip install 'dvc[gdrive]'
         pip install 'dvc[gs]'
 
     - uses: iterative/setup-dvc@v1
     - name: Get data
       run: dvc pull
       env:
-        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA2 }}
+        GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
 
     - name: Run prediction model
       env:
