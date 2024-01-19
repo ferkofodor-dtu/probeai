@@ -368,9 +368,7 @@ Originally I had the argparser solution, but I switched to Hydra. I used Hydra t
 ```bash
 python train.py experiment=experiment_name
 ```
-where `experiment_name` is the name of the experiment.
-
-It is important to note that an experiment is a combination of 2 config files: `model_conf` and `train_conf`.
+where `experiment_name` is a combination of a training and a model configuration. Now that I am starting to understand how to upscale properly the project, I think that I will be able to use Hydra more efficiently and be able to try many experiments at once.
 
 ```yaml
 `train_conf`
@@ -382,6 +380,7 @@ seed: 42
 ```
 
 ```yaml
+`model_conf`
 in_features: 1
 out_features: 2
 ```
@@ -399,7 +398,7 @@ out_features: 2
 >
 > Answer:
 
---- question 13 fill here ---
+To be able to replicate the experiments, I made sure to always train on the same data. Moreover, I used a seed to ensure that I fix the randomness as much as possible. As shown above, the seed is included in the config file. I also made sure to log the hyperparameters and metrics using Weights & Biases. This allowed me to easily compare experiments and reproduce them.
 
 ### Question 14
 
@@ -416,7 +415,17 @@ out_features: 2
 >
 > Answer:
 
---- question 14 fill here ---
+Overall, I am tracking the following metrics:
+* **Loss**: I am tracking the training and validation loss. This allows me to monitor the training process and detect overfitting.
+* **Accuracy**: I am tracking the training and validation accuracy. This allows me to monitor the training process and detect overfitting.
+
+![W&B](./figures/lightning_wandb.png)
+
+At the end, I ended up comparing two model implementations, one with and one without Pytorch Lightning, which on paper should be the same, yet they are not. I am still figuring out why, one guess would be that the seed is not working properly.
+
+![W&B](./figures/training_wandb.png)
+
+There are other metrics that can be looked at as well. Including a confusion matrix could be interesting, maybe logging best model performance as well. There are many possibilities, once there is an understaing of the tools I am working with. wandb looks like a very powerful tool to convey information fast and efficiently, even to people who might not understand the backend at all.
 
 ### Question 15
 
@@ -481,7 +490,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 18 fill here ---
+My project
 
 ### Question 19
 
@@ -490,7 +499,12 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 19 fill here ---
+I configured DVC on a GCP bucket, which can be seen in the following image:
+[DVC](./figures/cloud_bucket.png)
+
+I have not worked a lot in the cloud afterall, as I had countless of bugs elsewhere beforehand. Nevertheless, I did work through the examples of the class.
+
+
 
 ### Question 20
 
@@ -499,7 +513,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 20 fill here ---
+[cont](./figures/container_reg.png)
 
 ### Question 21
 
@@ -508,7 +522,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 21 fill here ---
+[cb](./figures/cloud_build.png)
 
 ### Question 22
 
@@ -524,7 +538,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 22 fill here ---
+I have not gotten to the deployment. This is where I lost the last week due to illness. Everything until deployment I have solved, mostly twice, but I do miss the last few modules.
 
 ### Question 23
 
@@ -539,7 +553,8 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 23 fill here ---
+I haven't monitored either, as I did not deploy.
+
 
 ### Question 24
 
@@ -553,7 +568,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 24 fill here ---
+The course examples were very small, so I ended up using less than $1 for now.
 
 ## Overall discussion of project
 
@@ -588,7 +603,7 @@ I used the following GCP services in my project:
 >
 > Answer:
 
---- question 26 fill here ---
+Debugging, without a doubt. I have seen beginners luck in action throughout the course, as in, while trying the examples, things were going okay, but then when having to implement on my code, things were falling apart from all angles. In addition, having a CUDA-compatible, yet very weak GPU, installing all the CUDA dependencies in dockerfiles makes things quite time consuming, especially when in the end result the build fails due to opencv. Apparently, the python cv2 is not working well with docker. Another scenario was when wandb changed it's host setting to localhost, which funnily enough does not return an error code, it freezes in init. I had countless of weird errors, where not even Google, let alone ChatGPT was really helpful. Running in WSL is also something new, which comes with it's own limitations. Afterall, for me this course was a change in thinking, as I have never worked with any of these tools before. I was somewhat familiar with environments, but the rest with such structure, I have never seen before. It was a a lot of fun and a lot of work! I am glad I got to learn a lot of new things, and I am eager to apply this knowledge in the my future projects.
 
 ### Question 27
 
