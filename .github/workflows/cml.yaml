@@ -6,7 +6,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Authenticate to Google Cloud
+      - name: Authenticate too Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
