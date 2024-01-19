@@ -18,6 +18,8 @@ jobs:
     - name: Install DVC
       run: |
         pip install 'dvc[gdrive]'
+        python -m pip install --upgrade pip
+        pip install -U pyopenssl cryptography
 
     - uses: iterative/setup-dvc@v1
     - name: Get data
@@ -33,6 +35,8 @@ jobs:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
           # Install requirements
+
+
           pip install -r requirements.txt
 
           python probeai/train.py
