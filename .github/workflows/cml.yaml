@@ -21,9 +21,15 @@ jobs:
         python -m pip install --upgrade pip
         pip install -U pyopenssl cryptography
 
+    # copy the credentials file to the runner
+    - name: Copy credentials file
+      run: |
+        mkdir -p $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/
+        cp ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }} $HOME/.cache/pydrive2fs/710796635688-iivsgbgsb6uv1fap6635dhvuei09o66c.apps.googleusercontent.com/default.json
+
     - uses: iterative/setup-dvc@v1
     - name: Get data
-      run: dvc pull
+      run: dvc pull -v
       env:
         GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS2 }}
 
